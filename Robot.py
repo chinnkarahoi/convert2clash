@@ -5,6 +5,11 @@ import requests, yaml
 import urllib.parse
 
 
+proxies = {
+    'proxy_list': [],
+    'proxy_names': []
+}
+
 def log(msg):
     time = datetime.datetime.now()
     print('[' + time.strftime('%Y.%m.%d-%H:%M:%S') + '] ' + msg)
@@ -26,9 +31,11 @@ def safe_decode(s):
 
 # 解析vmess节点
 def decode_v2ray_node(nodes):
+    print(nodes)
     proxy_list = []
     for node in nodes:
         decode_proxy = node.decode('utf-8')[8:]
+        decode_proxy = str(decode_proxy) + str('=' * (len(decode_proxy) % 4))
         if not decode_proxy or decode_proxy.isspace():
             log('vmess节点信息为空，跳过该节点')
             continue
@@ -90,6 +97,7 @@ def decode_ssr_node(nodes):
     proxy_list = []
     for node in nodes:
         decode_proxy = node.decode('utf-8')[6:]
+        decode_proxy = str(decode_proxy) + str('=' * (len(decode_proxy) % 4))
         if not decode_proxy or decode_proxy.isspace():
             log('ssr节点信息为空，跳过该节点')
             continue
@@ -118,10 +126,6 @@ def decode_ssr_node(nodes):
 # v2ray转换成Clash节点
 def v2ray_to_clash(arr):
     log('v2ray节点转换中...')
-    proxies = {
-        'proxy_list': [],
-        'proxy_names': []
-    }
     for item in arr:
         if item.get('ps') is None and item.get('add') is None and item.get('port') is None \
                 and item.get('id') is None and item.get('aid') is None:
@@ -154,10 +158,6 @@ def v2ray_to_clash(arr):
 # ss转换成Clash节点
 def ss_to_clash(arr):
     log('ss节点转换中...')
-    proxies = {
-        'proxy_list': [],
-        'proxy_names': []
-    }
     for item in arr:
         obj = {
             'name': item.get('name').strip() if item.get('name') else None,
@@ -186,10 +186,6 @@ def ss_to_clash(arr):
 # ssr转换成Clash节点
 def ssr_to_clash(arr):
     log('ssr节点转换中...')
-    proxies = {
-        'proxy_list': [],
-        'proxy_names': []
-    }
     for item in arr:
         obj = {
             'name': item.get('remarks').strip() if item.get('remarks') else None,
@@ -339,11 +335,11 @@ def save_config(path, data):
 # 程序入口
 if __name__ == '__main__':
     # 订阅地址 多个地址用;隔开
-    sub_url = input('请输入订阅地址(多个地址用;隔开):')
+    sub_url = "https://justmysocks3.net/members/getsub.php?service=56057&id=b1755cb2-7e1f-47f6-8604-7c505d7c2d97"
     # 输出路径
     output_path = './output.yaml'
     # 规则策略
-    config_url = 'https://cdn.jsdelivr.net/gh/Celeter/convert2clash@master/config.yaml'
+    config_url = ''
     config_path = './config.yaml'
 
     if sub_url is None or sub_url == '':
